@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Pocket - Fast Cash Loans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="notification-container"></div>
+
+    <!-- ===== LOGIN PAGE (DEFAULT) ===== -->
+    <div id="login-page" class="page active">
+        <div class="form-container">
+            <img src="logo2.144Z-removebg-preview.png" alt="Quick Pocket Logo" class="logo">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Login to your Quick Pocket account.</p>
+            <form id="login-form">
+                <div class="input-group"><label for="login-phone">Phone Number</label><input type="tel" id="login-phone" placeholder="9876543210" required></div>
+                <div class="input-group"><label for="login-password">Password</label><input type="password" id="login-password" placeholder="••••••••" required></div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <p class="form-switch">Don't have an account? <a href="#" id="show-register">Register here</a></p>
+            <p class="form-switch admin-link"><a href="#" id="show-admin-login">Admin Login</a></p>
+        </div>
+    </div>
+
+    <!-- ===== REGISTER PAGE ===== -->
+    <div id="register-page" class="page">
+        <div class="form-container">
+            <img src="logo2.144Z-removebg-preview.png" alt="Quick Pocket Logo" class="logo">
+            <h1>Create Account</h1>
+            <p class="subtitle">Get started with Quick Pocket.</p>
+            <form id="register-form">
+                <div class="input-group"><label for="register-name">Full Name</label><input type="text" id="register-name" placeholder="Srinivas" required></div>
+                <div class="input-group"><label for="register-phone">10-Digit Mobile Number</label><input type="tel" id="register-phone" placeholder="9876543210" required maxlength="10" pattern="\d{10}"></div>
+                <div class="input-group"><label for="register-password">Create Password</label><input type="password" id="register-password" placeholder="Minimum 6 characters" required></div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p class="form-switch">Already have an account? <a href="#" id="show-login">Login here</a></p>
+        </div>
+    </div>
+    
+    <!-- ===== ADMIN LOGIN PAGE ===== -->
+    <div id="admin-login-page" class="page">
+         <div class="form-container">
+            <img src="logo2.144Z-removebg-preview.png" alt="Quick Pocket Logo" class="logo">
+            <h1>Admin Panel</h1>
+            <p class="subtitle">Please enter administrator credentials.</p>
+            <form id="admin-login-form">
+                <div class="input-group"><label for="admin-email">Admin Email</label><input type="email" id="admin-email" value="admin@quickpocket.com" required></div>
+                <div class="input-group"><label for="admin-password">Password</label><input type="password" id="admin-password" value="SecurePass123!" required></div>
+                <button type="submit" class="btn">Admin Login</button>
+            </form>
+            <p class="form-switch"><a href="#" id="show-user-login-from-admin">Back to User Login</a></p>
+        </div>
+    </div>
+    
+    <!-- ===== DASHBOARD PAGES ===== -->
+    <div id="dashboard-page" class="page">
+        <div class="dashboard-container">
+            <header class="dashboard-header"><h2 id="dashboard-welcome">Welcome!</h2><a href="#" class="logout-link">Logout</a></header>
+            <div id="dashboard-content" class="card"></div>
+        </div>
+    </div>
+
+    <div id="admin-page" class="page">
+        <div class="dashboard-container">
+            <header class="dashboard-header"><h2>Admin Control Panel</h2><a href="#" class="logout-link">Logout</a></header>
+            <div class="card">
+                <h3>Applications Dashboard</h3>
+                <div class="table-container">
+                    <table id="admin-applications-table">
+                        <thead>
+                            <tr>
+                                <th>Applicant</th>
+                                <th>Loan Details</th>
+                                <th>Documents</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
