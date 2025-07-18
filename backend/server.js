@@ -1,4 +1,4 @@
-// server.js - FINAL GUARANTEED VERSION WITH REGISTRATION FIX
+// server.js - FINAL, CORRECTED VERSION FOR RENDER DEPLOYMENT
 
 const express = require('express');
 const cors = require('cors');
@@ -9,18 +9,20 @@ const multer = require('multer');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+// Render provides the PORT environment variable
+const PORT = process.env.PORT || 3000;
 
-// --- CONFIGURATION ---
-const JWT_SECRET = 'your-super-secret-jwt-key-that-is-long-and-secure';
-const ADMIN_EMAIL = 'admin@quickpocket.com';
-const ADMIN_PASSWORD = 'SecurePass123!';
+// --- CONFIGURATION - READS FROM ENVIRONMENT VARIABLES ---
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-local-testing';
+const ADMIN_EMAIL = 'admin@quickpocket.com'; // This is not a secret
+const ADMIN_PASSWORD = 'SecurePass123!'; // This is not a secret
+
+// This configuration is designed for Render's environment
 const dbConfig = {
-    user: 'postgres',
-    host: 'localhost',
-    database: 'quickpocket_db',
-    password: 'Bharathsql', // Your PostgreSQL password
-    port: 5432,
+    connectionString: process.env.DATABASE_URL, // Render provides this URL
+    ssl: {
+        rejectUnauthorized: false // Required for Render's database connections
+    }
 };
 
 // --- INITIALIZATION ---
@@ -54,28 +56,20 @@ const authenticateAdmin = (req, res, next) => { if (!req.user.isAdmin) return re
 
 // --- API ENDPOINTS ---
 
-// ** THIS IS THE CORRECTED REGISTRATION ENDPOINT **
+// Register
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const { name, phoneNumber, password } = req.body; // FIX: Now accepts 'name'
+        const { name, phoneNumber, password } = req.body;
         if (!name || !phoneNumber || !password) return res.status(400).json({ message: 'All fields are required.' });
-        
         const existingUser = await pool.query('SELECT * FROM users WHERE phone_number = $1', [phoneNumber]);
         if (existingUser.rows.length > 0) return res.status(400).json({ message: 'Phone number already registered.' });
-        
         const passwordHash = await bcrypt.hash(password, 10);
-        
-        // FIX: Now inserts 'name' into the database
         await pool.query('INSERT INTO users (name, phone_number, password_hash) VALUES ($1, $2, $3)', [name, phoneNumber, passwordHash]);
-        
         res.status(201).json({ message: 'Registration successful! Please log in.' });
-    } catch (error) { 
-        console.error('Reg Error:', error); 
-        res.status(500).json({ message: 'Server error during registration.' }); 
-    }
+    } catch (error) { console.error('Reg Error:', error); res.status(500).json({ message: 'Server error during registration.' }); }
 });
 
-// Login (No changes needed)
+// Login
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
@@ -96,7 +90,7 @@ app.post('/api/auth/login', async (req, res) => {
     } catch (error) { console.error('Login Error:', error); res.status(500).json({ message: 'Server error.' }); }
 });
 
-// User Dashboard (No changes needed)
+// User Dashboard
 app.get('/api/dashboard', authenticateToken, async (req, res) => {
     if (req.user.isAdmin) return res.status(403).json({ message: "Not a user token." });
     try {
@@ -106,7 +100,7 @@ app.get('/api/dashboard', authenticateToken, async (req, res) => {
     } catch (error) { console.error('Dashboard Error:', error); res.status(500).json({ message: 'Server error fetching dashboard.' }); }
 });
 
-// User Loan Application (No changes needed)
+// User Loan Application
 app.post('/api/apply', authenticateToken, upload.fields([{ name: 'selfie', maxCount: 1 }, { name: 'aadhar', maxCount: 1 }, { name: 'pan', maxCount: 1 }]), async (req, res) => {
     try {
         const { amount, tenure, name, altPhoneNumber } = req.body;
@@ -123,7 +117,7 @@ app.post('/api/apply', authenticateToken, upload.fields([{ name: 'selfie', maxCo
     } catch (error) { console.error('Apply Error:', error); res.status(500).json({ message: 'Server error during application submission.' }); }
 });
 
-// Admin Dashboard Data (No changes needed)
+// Admin Dashboard Data
 app.get('/api/admin/applications', authenticateToken, authenticateAdmin, async (req, res) => {
     try {
         const query = `SELECT app.*, u.name as user_name, u.phone_number as user_phone, u.alt_phone_number, u.selfie_url, u.aadhar_url, u.pan_url FROM applications app JOIN users u ON app.user_id = u.id ORDER BY app.date DESC`;
@@ -132,7 +126,7 @@ app.get('/api/admin/applications', authenticateToken, authenticateAdmin, async (
     } catch (error) { console.error('Admin Fetch Error:', error); res.status(500).json({ message: 'Server error fetching applications.' }); }
 });
 
-// Admin Status Update (No changes needed)
+// Admin Status Update
 app.put('/api/admin/applications/update-status', authenticateToken, authenticateAdmin, async (req, res) => {
     const { applicationId, newStatus } = req.body;
     if (!applicationId || !newStatus) return res.status(400).json({ message: 'Application ID and new status are required.' });
@@ -148,13 +142,13 @@ app.put('/api/admin/applications/update-status', authenticateToken, authenticate
 // --- SERVER START ---
 async function startServer() {
   try {
-    const client = await pool.connect();
+    await pool.connect();
     console.log('✅ Database connection established.');
-    client.release();
-    app.listen(PORT, () => console.log(`🚀 Quick Pocket server running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`🚀 Quick Pocket server running on port ${PORT}`));
   } catch (err) {
     console.error('❌ FATAL: COULD NOT CONNECT TO DATABASE!', err.message);
     process.exit(1);
   }
 }
+
 startServer();
