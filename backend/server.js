@@ -20,6 +20,10 @@ const dbConfig = {
     host: 'localhost',
     database: 'quickpocket_db',
     password: 'Bharathsql', // Your PostgreSQL password
+    connectionString: process.env.DATABASE_URL,
+    // **** ADD THIS LINE ****
+    ssl: true,
+};
     port: 5432,
 };
 
